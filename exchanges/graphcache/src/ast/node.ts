@@ -4,10 +4,18 @@ import {
   SelectionNode,
   SelectionSetNode,
   InlineFragmentNode,
+  GraphQLObjectType,
+  GraphQLInterfaceType,
+  GraphQLUnionType,
+  GraphQLNonNull,
+  GraphQLList,
   FieldNode,
   FragmentDefinitionNode,
   Kind,
 } from 'graphql';
+
+const SYMBOL_TO_STRING_TAG =
+  typeof Symbol === 'function' ? Symbol.toStringTag : '@@toStringTag';
 
 export type SelectionSet = ReadonlyArray<SelectionNode>;
 
@@ -38,3 +46,17 @@ export const isFieldNode = (node: SelectionNode): node is FieldNode =>
 export const isInlineFragment = (
   node: SelectionNode
 ): node is InlineFragmentNode => node.kind === Kind.INLINE_FRAGMENT;
+
+function instanceOf<T>(tag: string): (x: any) => x is T {
+  return (x: any): x is T => {
+    return typeof x === 'object' && x && x[SYMBOL_TO_STRING_TAG] === tag;
+  };
+}
+
+export const isObjectType = instanceOf<GraphQLObjectType>('GraphQLObjectType');
+export const isInterfaceType = instanceOf<GraphQLInterfaceType>(
+  'GraphQLInterfaceType'
+);
+export const isUnionType = instanceOf<GraphQLUnionType>('GraphQLUnionType');
+export const isNonNullType = instanceOf<GraphQLNonNull<any>>('GraphQLNonNull');
+export const isListType = instanceOf<GraphQLList<any>>('GraphQLList');

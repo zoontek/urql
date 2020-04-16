@@ -1,15 +1,13 @@
-import {
-  isNullableType,
-  isListType,
-  isNonNullType,
-  GraphQLSchema,
-  GraphQLAbstractType,
-  GraphQLObjectType,
-  GraphQLInterfaceType,
-  GraphQLUnionType,
-} from 'graphql';
-
+import { GraphQLSchema, GraphQLAbstractType, GraphQLObjectType } from 'graphql';
 import { warn, invariant } from '../helpers/help';
+
+import {
+  isObjectType,
+  isInterfaceType,
+  isUnionType,
+  isNonNullType,
+  isListType,
+} from './node';
 
 export const isFieldNullable = (
   schema: GraphQLSchema,
@@ -17,7 +15,7 @@ export const isFieldNullable = (
   fieldName: string
 ): boolean => {
   const field = getField(schema, typename, fieldName);
-  return !!field && isNullableType(field.type);
+  return !!field && !isNonNullType(field.type);
 };
 
 export const isListNullable = (
@@ -28,7 +26,7 @@ export const isListNullable = (
   const field = getField(schema, typename, fieldName);
   if (!field) return false;
   const ofType = isNonNullType(field.type) ? field.type.ofType : field.type;
-  return isListType(ofType) && isNullableType(ofType.ofType);
+  return isListType(ofType) && !isNonNullType(ofType.ofType);
 };
 
 export const isFieldAvailableOnType = (
@@ -50,7 +48,7 @@ export const isInterfaceOfType = (
   const abstractType = schema.getType(typeCondition);
   const objectType = schema.getType(typename);
 
-  if (abstractType instanceof GraphQLObjectType) {
+  if (isObjectType(abstractType)) {
     return abstractType === objectType;
   }
 
@@ -89,7 +87,7 @@ function expectObjectType(
   typename: string
 ): asserts x is GraphQLObjectType {
   invariant(
-    x instanceof GraphQLObjectType,
+    isObjectType(x),
     'Invalid Object type: The type `' +
       typename +
       '` is not an object in the defined schema, ' +
@@ -103,7 +101,7 @@ function expectAbstractType(
   typename: string
 ): asserts x is GraphQLAbstractType {
   invariant(
-    x instanceof GraphQLInterfaceType || x instanceof GraphQLUnionType,
+    isInterfaceType(x) || isUnionType(x),
     'Invalid Abstract type: The type `' +
       typename +
       '` is not an Interface or Union type in the defined schema, ' +
