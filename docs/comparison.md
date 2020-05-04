@@ -35,19 +35,44 @@ Support for [Preact](https://github.com/preactjs/preact) with Apollo and Relay c
 achieved through `preact/compat`, but isn't officially supported. Since Relay is specifically built
 against React, problems can be anticipated and it has been marked as "not supported."
 
+## Extensibility
+
+| Feature                             | `urql`                            | Apollo                 | Relay                   |
+| ----------------------------------- | --------------------------------- | ---------------------- | ----------------------- |
+| _APIs_                              |
+| Extension Interface                 | ✅ Yes, full input/output streams | ✅ Yes, output streams | ✅ Yes, network streams |
+| Customizable Caching & Control flow | ✅ Yes                            | 🔺 No                  | 🔺 No                   |
+| _Supported Extensions_              |
+| Retry library                       | ✅ Yes                            | ✅ Yes                 | 🔷 Unofficial           |
+| Batching library                    | 🔺 No                             | ✅ Yes                 | 🔷 Unofficial           |
+| Server-side rendering support       | ✅ Yes                            | ✅ Yes                 | 🔷 Unofficial           |
+
+`urql`'s extensibility system, [Exchanges](./concepts/exchanges.md), determine all of its logic and
+control flow, and its hence an extremely "hackable" API, where every piece of logic may be swapped
+out via its API, including the caching system.
+
+[Relay](https://github.com/relay-tools/react-relay-network-layer) and
+[Apollo](https://www.apollographql.com/docs/link/) have extensibility systems that are more geared
+towards the network layer, which allows for most of the same features.
+
+Most clients deliver some officially supported extensions to enable common features like batching,
+retrying, and other features.
+
 ## Caching Features
 
-| Feature               | `urql`         | Apollo                       | Relay  |
-| --------------------- | -------------- | ---------------------------- | ------ |
-| Document Caching      | ✅ Yes, opt-in | 🔺 No                        | 🔺 No  |
-| Normalized Caching    | ✅ Yes, opt-in | ✅ Yes                       | ✅ Yes |
-| Optimistic Updates    | ✅ Yes         | ✅ Yes                       | ✅ Yes |
-| Local State           | 🔺 No          | ✅ Yes                       | ✅ Yes |
-| Unopinionated Caching | ✅ Yes         | ✅ Yes                       | 🔺 No  |
-| Cache Redirects       | ✅ Yes         | ✅ Yes                       | 🔺 No  |
-| Cache Resolvers       | ✅ Yes         | 🔷 Limited                   | 🔺 No  |
-| Partial Results       | ✅ Yes         | 🔷 Manual, via unsafe option | 🔺 No  |
-| Relay Pagination      | ✅ Yes         | 🔷 Manual                    | ✅ Yes |
+| Feature                       | `urql`         | Apollo                       | Relay  |
+| ----------------------------- | -------------- | ---------------------------- | ------ |
+| _Caching Strategies_          |
+| Document Caching              | ✅ Yes, opt-in | 🔺 No                        | 🔺 No  |
+| Normalized Caching            | ✅ Yes, opt-in | ✅ Yes                       | ✅ Yes |
+| Local State                   | 🔺 No          | ✅ Yes                       | ✅ Yes |
+| _Normalized Caching Features_ |
+| Optimistic Updates            | ✅ Yes         | ✅ Yes                       | ✅ Yes |
+| Unopinionated Caching         | ✅ Yes         | ✅ Yes                       | 🔺 No  |
+| Cache Redirects               | ✅ Yes         | ✅ Yes                       | 🔺 No  |
+| Cache Resolvers               | ✅ Yes         | 🔷 Limited                   | 🔺 No  |
+| Partial Results               | ✅ Yes         | 🔷 Manual, via unsafe option | 🔺 No  |
+| Relay Pagination              | ✅ Yes         | 🔷 Manual                    | ✅ Yes |
 
 All clients offer normalized caching, although `urql`'s normalized caching support is provided via
 [Graphcache](./graphcache/README.md) and is hence an opt-in feature.
