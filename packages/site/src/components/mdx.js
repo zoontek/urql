@@ -160,7 +160,6 @@ const TableHeader = styled.th`
 `;
 
 const TableCell = styled.td`
-  width: min-content;
   ${sharedTableCellStyling}
 
   ${p => {
@@ -171,6 +170,7 @@ const TableCell = styled.td`
       isCodeOnly &&
       css`
         background-color: ${p.theme.colors.codeBg};
+        word-break: keep-all;
 
         & > ${InlineCode} {
           background: none;
@@ -181,18 +181,13 @@ const TableCell = styled.td`
     );
   }}
 
-  &:last-child {
-    min-width: 20rem;
-    width: max-content;
-  }
-
   &:first-child {
     white-space: nowrap;
+    width: min-content;
   }
 
-  &:nth-child(2) {
-    overflow-wrap: break-word;
-    min-width: 20rem;
+  &:not(:first-child) {
+    width: max-content;
   }
 `;
 
