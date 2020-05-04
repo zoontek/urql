@@ -203,6 +203,7 @@ const TableOverflow = styled.div`
 const Table = styled.table`
   border: 1px solid ${p => p.theme.colors.passiveBg};
   border-collapse: collapse;
+  width: 100%;
 `;
 
 const TableWithOverflow = props => (
