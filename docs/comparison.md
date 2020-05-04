@@ -37,16 +37,17 @@ against React, problems can be anticipated and it has been marked as "not suppor
 
 ## Caching Features
 
-| Feature               | `urql`         | Apollo     | Relay  |
-| --------------------- | -------------- | ---------- | ------ |
-| Document Caching      | ✅ Yes, opt-in | 🔺 No      | 🔺 No  |
-| Normalized Caching    | ✅ Yes, opt-in | ✅ Yes     | ✅ Yes |
-| Optimistic Updates    | ✅ Yes         | ✅ Yes     | ✅ Yes |
-| Local State           | 🔺 No          | ✅ Yes     | ✅ Yes |
-| Unopinionated Caching | ✅ Yes         | ✅ Yes     | 🔺 No  |
-| Cache Redirects       | ✅ Yes         | ✅ Yes     | 🔺 No  |
-| Cache Resolvers       | ✅ Yes         | 🔷 Limited | 🔺 No  |
-| Relay Pagination      | ✅ Yes         | 🔷 Manual  | ✅ Yes |
+| Feature               | `urql`         | Apollo                       | Relay  |
+| --------------------- | -------------- | ---------------------------- | ------ |
+| Document Caching      | ✅ Yes, opt-in | 🔺 No                        | 🔺 No  |
+| Normalized Caching    | ✅ Yes, opt-in | ✅ Yes                       | ✅ Yes |
+| Optimistic Updates    | ✅ Yes         | ✅ Yes                       | ✅ Yes |
+| Local State           | 🔺 No          | ✅ Yes                       | ✅ Yes |
+| Unopinionated Caching | ✅ Yes         | ✅ Yes                       | 🔺 No  |
+| Cache Redirects       | ✅ Yes         | ✅ Yes                       | 🔺 No  |
+| Cache Resolvers       | ✅ Yes         | 🔷 Limited                   | 🔺 No  |
+| Partial Results       | ✅ Yes         | 🔷 Manual, via unsafe option | 🔺 No  |
+| Relay Pagination      | ✅ Yes         | 🔷 Manual                    | ✅ Yes |
 
 All clients offer normalized caching, although `urql`'s normalized caching support is provided via
 [Graphcache](./graphcache/README.md) and is hence an opt-in feature.
@@ -67,6 +68,13 @@ manually retrieve data from the cache that has been queried before. Redirects en
 retrieve data for entities that the cache does know about but hasn't directly queried before via a
 specific field. While Apollo does support redirects, `urql`'s Graphcache supports more complex
 resolvers.
+
+Via [schema awareness](./graphcache/schema-awareness.md) `urql`'s Graphcache provides support for
+**partial cache results** which are allowed to deliver a cached result, when the cache can satisfy
+all required fields for a given query and only some partial fields. This is enabled by passing
+schema information to Graphcache. In Apollo, partial results can be forced with an option, but this
+option doesn't take schema information into account and may hence deliver partial data with missing
+required fields.
 
 Relay's [Pagination Specification](https://relay.dev/graphql/connections.htm) is a comprehensive
 standard to allow merging paginated lists (for infinite scrolling for instance) to be automated.
