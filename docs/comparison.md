@@ -18,6 +18,7 @@ comparison.
 | React Native support | ✅ Yes | ✅ Yes        | ✅ Yes |
 | Preact support       | ✅ Yes | 🔷 Partial    | 🔺 No  |
 | Svelte support       | ✅ Yes | 🔷 Unofficial | 🔺 No  |
+| Vue support          | 🔺 No  | 🔷 Unofficial | 🔺 No  |
 
 `urql`'s lean core allows framework bindings to be smaller and focus on their own idiomatic API
 first and foremost. This has allowed the creation of multiple supported framework bindings.
