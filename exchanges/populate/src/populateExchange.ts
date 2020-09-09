@@ -3,6 +3,7 @@ import {
   buildClientSchema,
   FragmentDefinitionNode,
   GraphQLSchema,
+  GraphQLInterfaceType,
   IntrospectionQuery,
   FragmentSpreadNode,
   isCompositeType,
@@ -11,9 +12,11 @@ import {
   SelectionSetNode,
   GraphQLObjectType,
   SelectionNode,
+  valueFromASTUntyped,
 } from 'graphql';
+
 import { pipe, tap, map } from 'wonka';
-import { Exchange, Operation } from '@urql/core';
+import { Exchange, Operation, stringifyVariables } from '@urql/core';
 
 import { warn } from './helpers/help';
 import {
@@ -32,6 +35,19 @@ interface PopulateExchangeOpts {
   schema: IntrospectionQuery;
 }
 
+/** @populate stores information per each type it finds */
+type TypeKey = GraphQLObjectType | GraphQLInterfaceType;
+/** @populate stores all known fields per each type key */
+type TypeFields = Map<TypeKey, Record<string, FieldUsage>>;
+/** @populate stores all fields returning a specific type */
+type TypeParents = Map<TypeKey, Set<FieldUsage>>;
+/** Describes information about a given field, i.e. type (owner), arguments, how many operations use this field */
+interface FieldUsage {
+  type: TypeKey;
+  args: null | object;
+  active: number;
+}
+
 const makeDict = (): any => Object.create(null);
 
 /** An exchange for auto-populating mutations with a required response body. */
@@ -47,6 +63,79 @@ export const populateExchange = ({
   const userFragments: UserFragmentMap = makeDict();
   /** Collection of actively in use type fragments. */
   const activeTypeFragments: TypeFragmentMap = makeDict();
+
+  // State of the global types & their fields
+  const typeFields: TypeFields = new Map();
+  const typeParents: TypeParents = new Map();
+
+  // State of the current operation
+  const currentVisited: Set<string> = new Set();
+  const currentVariables: object = {};
+
+  const readFromSelectionSet = (
+    type: GraphQLObjectType | GraphQLInterfaceType,
+    selections: readonly SelectionNode[],
+    seenFields: Record<string, TypeKey> = {}
+  ) => {
+    const interfaces = type.getInterfaces();
+    for (let i = 0; i < interfaces.length; i++)
+      readFromSelectionSet(interfaces[i], selections, seenFields);
+
+    const fieldMap = type.getFields();
+
+    let args: null | object = null;
+    for (let i = 0; i < selections.length; i++) {
+      const selection = selections[i];
+      if (selection.kind !== Kind.FIELD) continue;
+
+      const fieldName = selection.name.value;
+      if (!fieldMap[fieldName]) continue;
+
+      const ownerType = seenFields[fieldName] || (seenFields[fieldName] = type);
+      let fields = typeFields.get(ownerType);
+      if (!fields) typeFields.set(type, (fields = {}));
+
+      if (selection.arguments) {
+        args = {};
+        for (let j = 0; j < selection.arguments.length; j++) {
+          const argNode = selection.arguments[j];
+          args[argNode.name.value] = valueFromASTUntyped(
+            argNode.value,
+            currentVariables
+          );
+        }
+      }
+
+      const fieldKey = args
+        ? `${fieldName}:${stringifyVariables(args)}`
+        : fieldName;
+      const field =
+        fields[fieldKey] || (fields[fieldKey] = { type, args, active: 0 });
+      field.active++;
+
+      if (selection.selectionSet) {
+        const childType = fieldMap[fieldName].type as GraphQLObjectType;
+
+        let parents = typeParents.get(childType);
+        if (!parents) {
+          parents = new Set();
+          typeParents.set(childType, parents);
+        }
+
+        parents.add(field);
+        readFromSelectionSet(childType, selection.selectionSet.selections);
+      }
+    }
+  };
+
+  const readFromQuery = (node: DocumentNode) => {
+    for (let i = 0; i < node.definitions.length; i++) {
+      const definition = node.definitions[i];
+      if (definition.kind !== Kind.OPERATION_DEFINITION) continue;
+      const type = schema.getQueryType()!;
+      readFromSelectionSet(type, definition.selectionSet.selections!);
+    }
+  };
 
   /** Handle mutation and inject selections + fragments. */
   const handleIncomingMutation = (op: Operation) => {
