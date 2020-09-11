@@ -45,7 +45,7 @@ type TypeParents = Map<TypeKey, Set<FieldUsage>>;
 interface FieldUsage {
   type: TypeKey;
   args: null | object;
-  active: number;
+  fieldName: string;
 }
 
 const makeDict = (): any => Object.create(null);
@@ -69,61 +69,73 @@ export const populateExchange = ({
   const typeParents: TypeParents = new Map();
 
   // State of the current operation
-  const currentVisited: Set<string> = new Set();
-  const currentVariables: object = {};
+  // const currentVisited: Set<string> = new Set();
+  let currentVariables: object = {};
 
   const readFromSelectionSet = (
     type: GraphQLObjectType | GraphQLInterfaceType,
     selections: readonly SelectionNode[],
     seenFields: Record<string, TypeKey> = {}
   ) => {
-    const interfaces = type.getInterfaces();
-    for (let i = 0; i < interfaces.length; i++)
-      readFromSelectionSet(interfaces[i], selections, seenFields);
+    if (isAbstractType(type)) {
+      // TODO: should we add this to typeParents/typeFields as well?
+      schema.getPossibleTypes(type).forEach(t => {
+        readFromSelectionSet(t, selections, seenFields);
+      });
+    } else {
+      const fieldMap = type.getFields();
 
-    const fieldMap = type.getFields();
+      let args: null | object = null;
+      for (let i = 0; i < selections.length; i++) {
+        const selection = selections[i];
+        if (selection.kind !== Kind.FIELD) continue;
 
-    let args: null | object = null;
-    for (let i = 0; i < selections.length; i++) {
-      const selection = selections[i];
-      if (selection.kind !== Kind.FIELD) continue;
+        const fieldName = selection.name.value;
+        if (!fieldMap[fieldName]) continue;
 
-      const fieldName = selection.name.value;
-      if (!fieldMap[fieldName]) continue;
+        const ownerType =
+          seenFields[fieldName] || (seenFields[fieldName] = type);
 
-      const ownerType = seenFields[fieldName] || (seenFields[fieldName] = type);
-      let fields = typeFields.get(ownerType);
-      if (!fields) typeFields.set(type, (fields = {}));
+        let fields = typeFields.get(ownerType);
+        if (!fields) typeFields.set(type, (fields = {}));
 
-      if (selection.arguments) {
-        args = {};
-        for (let j = 0; j < selection.arguments.length; j++) {
-          const argNode = selection.arguments[j];
-          args[argNode.name.value] = valueFromASTUntyped(
-            argNode.value,
-            currentVariables
-          );
-        }
-      }
+        const childType = unwrapType(
+          fieldMap[fieldName].type
+        ) as GraphQLObjectType;
 
-      const fieldKey = args
-        ? `${fieldName}:${stringifyVariables(args)}`
-        : fieldName;
-      const field =
-        fields[fieldKey] || (fields[fieldKey] = { type, args, active: 0 });
-      field.active++;
-
-      if (selection.selectionSet) {
-        const childType = fieldMap[fieldName].type as GraphQLObjectType;
-
-        let parents = typeParents.get(childType);
-        if (!parents) {
-          parents = new Set();
-          typeParents.set(childType, parents);
+        if (selection.arguments && selection.arguments.length) {
+          args = {};
+          for (let j = 0; j < selection.arguments.length; j++) {
+            const argNode = selection.arguments[j];
+            args[argNode.name.value] = valueFromASTUntyped(
+              argNode.value,
+              currentVariables
+            );
+          }
         }
 
-        parents.add(field);
-        readFromSelectionSet(childType, selection.selectionSet.selections);
+        const fieldKey = args
+          ? `${fieldName}:${stringifyVariables(args)}`
+          : fieldName;
+
+        const field =
+          fields[fieldKey] ||
+          (fields[fieldKey] = {
+            type: childType,
+            args,
+            fieldName,
+          });
+
+        if (selection.selectionSet) {
+          let parents = typeParents.get(childType);
+          if (!parents) {
+            parents = new Set();
+            typeParents.set(childType, parents);
+          }
+
+          parents.add(field);
+          readFromSelectionSet(childType, selection.selectionSet.selections);
+        }
       }
     }
   };
@@ -133,7 +145,10 @@ export const populateExchange = ({
       const definition = node.definitions[i];
       if (definition.kind !== Kind.OPERATION_DEFINITION) continue;
       const type = schema.getQueryType()!;
-      readFromSelectionSet(type, definition.selectionSet.selections!);
+      readFromSelectionSet(
+        unwrapType(type) as GraphQLObjectType,
+        definition.selectionSet.selections!
+      );
     }
   };
 
@@ -162,7 +177,12 @@ export const populateExchange = ({
   };
 
   /** Handle query and extract fragments. */
-  const handleIncomingQuery = ({ key, operationName, query }: Operation) => {
+  const handleIncomingQuery = ({
+    key,
+    operationName,
+    query,
+    variables,
+  }: Operation) => {
     if (operationName !== 'query') {
       return;
     }
@@ -173,6 +193,8 @@ export const populateExchange = ({
     }
 
     parsedOperations.add(key);
+    currentVariables = variables || {};
+    readFromQuery(query);
 
     const [extractedFragments, newFragments] = extractSelectionsFromQuery(
       schema,
