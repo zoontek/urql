@@ -4,6 +4,7 @@ import { Client } from '../client';
 import { queryOperation, queryResponse } from '../test-utils';
 import { ExchangeIO, Operation, OperationResult } from '../types';
 import { CombinedError } from '../utils';
+import { getExchangeSignature } from './compose';
 import { ssrExchange } from './ssr';
 
 let forward: ExchangeIO;
@@ -23,6 +24,13 @@ beforeEach(() => {
   forward = ops$ => pipe(ops$, map(output));
   client = { suspense: true } as any;
   exchangeInput = { forward, client };
+});
+
+it('has the expected exchange signature', () => {
+  const ssr = ssrExchange();
+  expect(getExchangeSignature(ssr(exchangeInput))).toMatchInlineSnapshot(
+    `"0,tag"`
+  );
 });
 
 it('caches query results correctly', () => {

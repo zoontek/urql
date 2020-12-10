@@ -11,6 +11,7 @@ import {
 import { Client } from '../client';
 import { subscriptionOperation, subscriptionResult } from '../test-utils';
 import { OperationResult } from '../types';
+import { getExchangeSignature } from './compose';
 import { subscriptionExchange, SubscriptionForwarder } from './subscription';
 
 it('should return response data from forwardSubscription observable', async () => {
@@ -37,15 +38,19 @@ it('should return response data from forwardSubscription observable', async () =
     };
   };
 
+  const exchange = subscriptionExchange({ forwardSubscription })(exchangeArgs);
+
   const data = await pipe(
     fromValue(subscriptionOperation),
-    subscriptionExchange({ forwardSubscription })(exchangeArgs),
+    exchange,
     take(1),
     toPromise
   );
 
   expect(data).toMatchSnapshot();
   expect(unsubscribe).toHaveBeenCalled();
+
+  expect(getExchangeSignature(exchange)).toMatchInlineSnapshot(`"0,tag"`);
 });
 
 it('should tear down the operation if the source subscription ends', async () => {

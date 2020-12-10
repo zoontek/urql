@@ -2,6 +2,7 @@ import { makeSubject, map, pipe, publish, Source, Subject } from 'wonka';
 import { Client } from '../client';
 import { queryOperation, queryResponse } from '../test-utils';
 import { Operation } from '../types';
+import { getExchangeSignature } from './compose';
 import { debugExchange } from './debug';
 
 let exchangeArgs;
@@ -24,6 +25,11 @@ beforeEach(() => {
   };
 
   exchangeArgs = { forward, subject: {} as Client };
+});
+
+it('has the expected exchange signature', () => {
+  const exchange = debugExchange(exchangeArgs);
+  expect(getExchangeSignature(exchange)).toMatchInlineSnapshot(`"0,tag"`);
 });
 
 it('forwards query operations correctly', async () => {

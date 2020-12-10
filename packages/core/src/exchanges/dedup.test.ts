@@ -7,12 +7,15 @@ import {
   Source,
   Subject,
 } from 'wonka';
+
 import {
   mutationOperation,
   queryOperation,
   queryResponse,
 } from '../test-utils';
+
 import { Operation } from '../types';
+import { getExchangeSignature } from './compose';
 import { dedupExchange } from './dedup';
 import { makeOperation } from '../utils';
 
@@ -40,6 +43,11 @@ beforeEach(() => {
   };
 
   exchangeArgs = { forward, client: {}, dispatchDebug };
+});
+
+it('has the expected exchange signature', () => {
+  const exchange = dedupExchange(exchangeArgs);
+  expect(getExchangeSignature(exchange)).toMatchInlineSnapshot(`"0,tag"`);
 });
 
 it('forwards query operations correctly', async () => {

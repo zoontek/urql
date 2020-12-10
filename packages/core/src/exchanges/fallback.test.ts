@@ -1,5 +1,6 @@
 import { forEach, fromValue, pipe } from 'wonka';
 import { queryOperation, teardownOperation } from '../test-utils';
+import { getExchangeSignature } from './compose';
 import { fallbackExchange } from './fallback';
 
 const consoleWarn = console.warn;
@@ -12,6 +13,12 @@ beforeEach(() => {
 
 afterAll(() => {
   console.warn = consoleWarn;
+});
+
+it('has the expected exchange signature', () => {
+  expect(
+    getExchangeSignature(fallbackExchange({ dispatchDebug }))
+  ).toMatchInlineSnapshot(`"0,tag"`);
 });
 
 it('filters all results and warns about input', () => {

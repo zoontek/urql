@@ -4,6 +4,7 @@ import { Client } from '../client';
 import { makeOperation } from '../utils';
 import { queryOperation } from '../test-utils';
 import { OperationResult } from '../types';
+import { getExchangeSignature } from './compose';
 import { fetchExchange } from './fetch';
 
 const fetch = (global as any).fetch as jest.Mock;
@@ -46,6 +47,12 @@ const exchangeArgs = {
     },
   } as any) as Client,
 };
+
+it('has the expected exchange signature', () => {
+  expect(
+    getExchangeSignature(fetchExchange(exchangeArgs))
+  ).toMatchInlineSnapshot(`"0,tag"`);
+});
 
 describe('on success', () => {
   beforeEach(() => {

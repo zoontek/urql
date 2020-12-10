@@ -2,7 +2,8 @@ import { makeSubject, map, pipe, publish, Subject } from 'wonka';
 import { Client } from '../client';
 import { queryOperation } from '../test-utils';
 import { makeErrorResult, CombinedError } from '../utils';
-import { Operation } from '../types';
+import { Operation, ExchangeInput } from '../types';
+import { getExchangeSignature } from './compose';
 import { errorExchange } from './error';
 
 const error = new Error('Sad times');
@@ -10,6 +11,22 @@ let input: Subject<Operation>;
 
 beforeEach(() => {
   input = makeSubject<Operation>();
+});
+
+it('has the expected exchange signature', () => {
+  const onError = jest.fn();
+  const exchangeArgs = {
+    forward: op$ =>
+      pipe(
+        op$,
+        map((operation: Operation) => ({ operation }))
+      ),
+    client: {} as Client,
+    dispatchDebug: () => null,
+  } as ExchangeInput;
+
+  const exchange = errorExchange({ onError })(exchangeArgs);
+  expect(getExchangeSignature(exchange)).toMatchInlineSnapshot(`"0,tag"`);
 });
 
 it('does not trigger when there are no errors', async () => {
