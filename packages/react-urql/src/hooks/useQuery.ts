@@ -55,17 +55,17 @@ export type UseQueryResponse<Data = any, Variables = object> = [
 function toSuspenseSource<T>(source: Source<T>): Source<T> {
   const shared = share(source);
   let cache: T | void;
-  let resolve: (value: T) => void;
 
   return sink => {
     let hasSuspended = false;
+    let resolve: (value: T) => void;
 
     pipe(
-      shared,
+      cache !== undefined ? concat([fromValue(cache), shared]) : shared,
       takeWhile(result => {
         // The first result that is received will resolve the suspense
         // promise after waiting for a microtick
-        if (cache === undefined) Promise.resolve(result).then(resolve);
+        if (resolve) Promise.resolve(result).then(resolve);
         cache = result;
         return !hasSuspended;
       })
@@ -73,13 +73,8 @@ function toSuspenseSource<T>(source: Source<T>): Source<T> {
 
     // If we haven't got a previous result then start suspending
     // otherwise issue the last known result immediately
-    if (cache !== undefined) {
-      const signal = [cache] as [T] & { tag: 1 };
-      signal.tag = 1;
-      sink(signal);
-    } else {
+    if (cache === undefined) {
       hasSuspended = true;
-      sink(0 /* End */);
       throw new Promise<T>(_resolve => {
         resolve = _resolve;
       });
