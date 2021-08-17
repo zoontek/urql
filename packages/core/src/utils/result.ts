@@ -33,11 +33,6 @@ export const mergeResultPatch = (
   const result = { ...prevResult };
   result.hasNext = !!patch.hasNext;
 
-  if (!('path' in patch)) {
-    if ('data' in patch) result.data = patch.data;
-    return result;
-  }
-
   if (Array.isArray(patch.errors)) {
     result.error = new CombinedError({
       graphQLErrors: result.error
@@ -45,6 +40,11 @@ export const mergeResultPatch = (
         : patch.errors,
       response,
     });
+  }
+
+  if (!('path' in patch)) {
+    if ('data' in patch) result.data = patch.data;
+    return result;
   }
 
   let part: Record<string, any> | Array<any> = (result.data = {

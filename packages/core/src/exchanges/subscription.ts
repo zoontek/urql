@@ -11,7 +11,12 @@ import {
   takeUntil,
 } from 'wonka';
 
-import { makeResult, makeErrorResult, makeOperation } from '../utils';
+import {
+  makeResult,
+  mergeResultPatch,
+  makeErrorResult,
+  makeOperation,
+} from '../utils';
 
 import {
   Exchange,
@@ -79,10 +84,20 @@ export const subscriptionExchange = ({
       Promise.resolve().then(() => {
         if (isComplete) return;
 
+        let prevResult: OperationResult | void;
         sub = observableish.subscribe({
-          next: result => next(makeResult(operation, result)),
-          error: err => next(makeErrorResult(operation, err)),
-          complete: () => {
+          next(result) {
+            next(
+              (prevResult =
+                prevResult && operation.kind !== 'subscription'
+                  ? mergeResultPatch(prevResult, result)
+                  : makeResult(operation, result))
+            );
+          },
+          error(err) {
+            next(makeErrorResult(operation, err));
+          },
+          complete() {
             if (!isComplete) {
               isComplete = true;
               if (operation.kind === 'subscription') {
