@@ -134,3 +134,655 @@ subscription subscribeToUser($user: String) { user(user: $user) { name } }",
   },
 }
 `;
+
+exports[`should support deferred operations coming in 1`] = `
+Array [
+  Object {
+    "data": Object {
+      "author": Object {
+        "__typename": "Author",
+        "id": "1",
+        "name": "Steve",
+        "todos": Array [
+          Object {
+            "__typename": "Todo",
+            "id": "1",
+            "text": "stream",
+          },
+        ],
+      },
+    },
+    "error": undefined,
+    "extensions": undefined,
+    "hasNext": true,
+    "operation": Object {
+      "context": Object {
+        "fetchOptions": Object {
+          "method": "POST",
+        },
+        "requestPolicy": "cache-first",
+        "url": "http://localhost:3000/graphql",
+      },
+      "key": 1,
+      "kind": "query",
+      "query": Object {
+        "__key": 3321206837,
+        "definitions": Array [
+          Object {
+            "directives": Array [],
+            "kind": "OperationDefinition",
+            "loc": undefined,
+            "name": undefined,
+            "operation": "query",
+            "selectionSet": Object {
+              "kind": "SelectionSet",
+              "loc": undefined,
+              "selections": Array [
+                Object {
+                  "alias": undefined,
+                  "arguments": Array [],
+                  "directives": Array [],
+                  "kind": "Field",
+                  "loc": undefined,
+                  "name": Object {
+                    "kind": "Name",
+                    "loc": undefined,
+                    "value": "author",
+                  },
+                  "selectionSet": Object {
+                    "kind": "SelectionSet",
+                    "loc": undefined,
+                    "selections": Array [
+                      Object {
+                        "alias": undefined,
+                        "arguments": Array [],
+                        "directives": Array [],
+                        "kind": "Field",
+                        "loc": undefined,
+                        "name": Object {
+                          "kind": "Name",
+                          "loc": undefined,
+                          "value": "id",
+                        },
+                        "selectionSet": undefined,
+                      },
+                      Object {
+                        "alias": undefined,
+                        "arguments": Array [],
+                        "directives": Array [],
+                        "kind": "Field",
+                        "loc": undefined,
+                        "name": Object {
+                          "kind": "Name",
+                          "loc": undefined,
+                          "value": "name",
+                        },
+                        "selectionSet": undefined,
+                      },
+                      Object {
+                        "alias": undefined,
+                        "arguments": Array [],
+                        "directives": Array [
+                          Object {
+                            "arguments": Array [],
+                            "kind": "Directive",
+                            "loc": undefined,
+                            "name": Object {
+                              "kind": "Name",
+                              "loc": undefined,
+                              "value": "stream",
+                            },
+                          },
+                        ],
+                        "kind": "Field",
+                        "loc": undefined,
+                        "name": Object {
+                          "kind": "Name",
+                          "loc": undefined,
+                          "value": "todos",
+                        },
+                        "selectionSet": Object {
+                          "kind": "SelectionSet",
+                          "loc": undefined,
+                          "selections": Array [
+                            Object {
+                              "alias": undefined,
+                              "arguments": Array [],
+                              "directives": Array [],
+                              "kind": "Field",
+                              "loc": undefined,
+                              "name": Object {
+                                "kind": "Name",
+                                "loc": undefined,
+                                "value": "id",
+                              },
+                              "selectionSet": undefined,
+                            },
+                            Object {
+                              "alias": undefined,
+                              "arguments": Array [],
+                              "directives": Array [],
+                              "kind": "Field",
+                              "loc": undefined,
+                              "name": Object {
+                                "kind": "Name",
+                                "loc": undefined,
+                                "value": "text",
+                              },
+                              "selectionSet": undefined,
+                            },
+                          ],
+                        },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+            "variableDefinitions": Array [],
+          },
+        ],
+        "kind": "Document",
+        "loc": Object {
+          "end": 48,
+          "source": Object {
+            "body": "{ author { id name todos @stream { id text } } }",
+            "locationOffset": Object {
+              "column": 1,
+              "line": 1,
+            },
+            "name": "gql",
+          },
+          "start": 0,
+        },
+      },
+      "variables": Object {},
+    },
+  },
+  Object {
+    "data": Object {
+      "author": Object {
+        "__typename": "Author",
+        "id": "1",
+        "name": "Steve",
+        "todos": Array [
+          Object {
+            "__typename": "Todo",
+            "id": "1",
+            "text": "stream",
+          },
+          Object {
+            "__typename": "Todo",
+            "id": "2",
+            "text": "defer",
+          },
+        ],
+      },
+    },
+    "error": undefined,
+    "extensions": undefined,
+    "hasNext": false,
+    "operation": Object {
+      "context": Object {
+        "fetchOptions": Object {
+          "method": "POST",
+        },
+        "requestPolicy": "cache-first",
+        "url": "http://localhost:3000/graphql",
+      },
+      "key": 1,
+      "kind": "query",
+      "query": Object {
+        "__key": 3321206837,
+        "definitions": Array [
+          Object {
+            "directives": Array [],
+            "kind": "OperationDefinition",
+            "loc": undefined,
+            "name": undefined,
+            "operation": "query",
+            "selectionSet": Object {
+              "kind": "SelectionSet",
+              "loc": undefined,
+              "selections": Array [
+                Object {
+                  "alias": undefined,
+                  "arguments": Array [],
+                  "directives": Array [],
+                  "kind": "Field",
+                  "loc": undefined,
+                  "name": Object {
+                    "kind": "Name",
+                    "loc": undefined,
+                    "value": "author",
+                  },
+                  "selectionSet": Object {
+                    "kind": "SelectionSet",
+                    "loc": undefined,
+                    "selections": Array [
+                      Object {
+                        "alias": undefined,
+                        "arguments": Array [],
+                        "directives": Array [],
+                        "kind": "Field",
+                        "loc": undefined,
+                        "name": Object {
+                          "kind": "Name",
+                          "loc": undefined,
+                          "value": "id",
+                        },
+                        "selectionSet": undefined,
+                      },
+                      Object {
+                        "alias": undefined,
+                        "arguments": Array [],
+                        "directives": Array [],
+                        "kind": "Field",
+                        "loc": undefined,
+                        "name": Object {
+                          "kind": "Name",
+                          "loc": undefined,
+                          "value": "name",
+                        },
+                        "selectionSet": undefined,
+                      },
+                      Object {
+                        "alias": undefined,
+                        "arguments": Array [],
+                        "directives": Array [
+                          Object {
+                            "arguments": Array [],
+                            "kind": "Directive",
+                            "loc": undefined,
+                            "name": Object {
+                              "kind": "Name",
+                              "loc": undefined,
+                              "value": "stream",
+                            },
+                          },
+                        ],
+                        "kind": "Field",
+                        "loc": undefined,
+                        "name": Object {
+                          "kind": "Name",
+                          "loc": undefined,
+                          "value": "todos",
+                        },
+                        "selectionSet": Object {
+                          "kind": "SelectionSet",
+                          "loc": undefined,
+                          "selections": Array [
+                            Object {
+                              "alias": undefined,
+                              "arguments": Array [],
+                              "directives": Array [],
+                              "kind": "Field",
+                              "loc": undefined,
+                              "name": Object {
+                                "kind": "Name",
+                                "loc": undefined,
+                                "value": "id",
+                              },
+                              "selectionSet": undefined,
+                            },
+                            Object {
+                              "alias": undefined,
+                              "arguments": Array [],
+                              "directives": Array [],
+                              "kind": "Field",
+                              "loc": undefined,
+                              "name": Object {
+                                "kind": "Name",
+                                "loc": undefined,
+                                "value": "text",
+                              },
+                              "selectionSet": undefined,
+                            },
+                          ],
+                        },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+            "variableDefinitions": Array [],
+          },
+        ],
+        "kind": "Document",
+        "loc": Object {
+          "end": 48,
+          "source": Object {
+            "body": "{ author { id name todos @stream { id text } } }",
+            "locationOffset": Object {
+              "column": 1,
+              "line": 1,
+            },
+            "name": "gql",
+          },
+          "start": 0,
+        },
+      },
+      "variables": Object {},
+    },
+  },
+]
+`;
+
+exports[`should support streamed operations coming in 1`] = `
+Array [
+  Object {
+    "data": Object {
+      "author": Object {
+        "__typename": "Author",
+        "id": "1",
+      },
+    },
+    "error": undefined,
+    "extensions": undefined,
+    "hasNext": true,
+    "operation": Object {
+      "context": Object {
+        "fetchOptions": Object {
+          "method": "POST",
+        },
+        "requestPolicy": "cache-first",
+        "url": "http://localhost:3000/graphql",
+      },
+      "key": 1,
+      "kind": "query",
+      "query": Object {
+        "__key": 496779830,
+        "definitions": Array [
+          Object {
+            "directives": Array [],
+            "kind": "OperationDefinition",
+            "loc": undefined,
+            "name": undefined,
+            "operation": "query",
+            "selectionSet": Object {
+              "kind": "SelectionSet",
+              "loc": undefined,
+              "selections": Array [
+                Object {
+                  "alias": undefined,
+                  "arguments": Array [],
+                  "directives": Array [],
+                  "kind": "Field",
+                  "loc": undefined,
+                  "name": Object {
+                    "kind": "Name",
+                    "loc": undefined,
+                    "value": "author",
+                  },
+                  "selectionSet": Object {
+                    "kind": "SelectionSet",
+                    "loc": undefined,
+                    "selections": Array [
+                      Object {
+                        "alias": undefined,
+                        "arguments": Array [],
+                        "directives": Array [],
+                        "kind": "Field",
+                        "loc": undefined,
+                        "name": Object {
+                          "kind": "Name",
+                          "loc": undefined,
+                          "value": "id",
+                        },
+                        "selectionSet": undefined,
+                      },
+                      Object {
+                        "directives": Array [
+                          Object {
+                            "arguments": Array [],
+                            "kind": "Directive",
+                            "loc": undefined,
+                            "name": Object {
+                              "kind": "Name",
+                              "loc": undefined,
+                              "value": "defer",
+                            },
+                          },
+                        ],
+                        "kind": "FragmentSpread",
+                        "loc": undefined,
+                        "name": Object {
+                          "kind": "Name",
+                          "loc": undefined,
+                          "value": "authorFields",
+                        },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+            "variableDefinitions": Array [],
+          },
+          Object {
+            "directives": Array [],
+            "kind": "FragmentDefinition",
+            "loc": Object {
+              "end": 40,
+              "source": Object {
+                "body": "fragment authorFields on Author { name }",
+                "locationOffset": Object {
+                  "column": 1,
+                  "line": 1,
+                },
+                "name": "gql",
+              },
+              "start": 0,
+            },
+            "name": Object {
+              "kind": "Name",
+              "loc": undefined,
+              "value": "authorFields",
+            },
+            "selectionSet": Object {
+              "kind": "SelectionSet",
+              "loc": undefined,
+              "selections": Array [
+                Object {
+                  "alias": undefined,
+                  "arguments": Array [],
+                  "directives": Array [],
+                  "kind": "Field",
+                  "loc": undefined,
+                  "name": Object {
+                    "kind": "Name",
+                    "loc": undefined,
+                    "value": "name",
+                  },
+                  "selectionSet": undefined,
+                },
+              ],
+            },
+            "typeCondition": Object {
+              "kind": "NamedType",
+              "loc": undefined,
+              "name": Object {
+                "kind": "Name",
+                "loc": undefined,
+                "value": "Author",
+              },
+            },
+          },
+        ],
+        "kind": "Document",
+        "loc": Object {
+          "end": 81,
+          "source": Object {
+            "body": "{ author { id ...authorFields @defer } } fragment authorFields on Author { name }",
+            "locationOffset": Object {
+              "column": 1,
+              "line": 1,
+            },
+            "name": "gql",
+          },
+          "start": 0,
+        },
+      },
+      "variables": Object {},
+    },
+  },
+  Object {
+    "data": Object {
+      "author": Object {
+        "__typename": "Author",
+        "id": "1",
+        "name": "Steve",
+      },
+    },
+    "error": undefined,
+    "extensions": undefined,
+    "hasNext": true,
+    "operation": Object {
+      "context": Object {
+        "fetchOptions": Object {
+          "method": "POST",
+        },
+        "requestPolicy": "cache-first",
+        "url": "http://localhost:3000/graphql",
+      },
+      "key": 1,
+      "kind": "query",
+      "query": Object {
+        "__key": 496779830,
+        "definitions": Array [
+          Object {
+            "directives": Array [],
+            "kind": "OperationDefinition",
+            "loc": undefined,
+            "name": undefined,
+            "operation": "query",
+            "selectionSet": Object {
+              "kind": "SelectionSet",
+              "loc": undefined,
+              "selections": Array [
+                Object {
+                  "alias": undefined,
+                  "arguments": Array [],
+                  "directives": Array [],
+                  "kind": "Field",
+                  "loc": undefined,
+                  "name": Object {
+                    "kind": "Name",
+                    "loc": undefined,
+                    "value": "author",
+                  },
+                  "selectionSet": Object {
+                    "kind": "SelectionSet",
+                    "loc": undefined,
+                    "selections": Array [
+                      Object {
+                        "alias": undefined,
+                        "arguments": Array [],
+                        "directives": Array [],
+                        "kind": "Field",
+                        "loc": undefined,
+                        "name": Object {
+                          "kind": "Name",
+                          "loc": undefined,
+                          "value": "id",
+                        },
+                        "selectionSet": undefined,
+                      },
+                      Object {
+                        "directives": Array [
+                          Object {
+                            "arguments": Array [],
+                            "kind": "Directive",
+                            "loc": undefined,
+                            "name": Object {
+                              "kind": "Name",
+                              "loc": undefined,
+                              "value": "defer",
+                            },
+                          },
+                        ],
+                        "kind": "FragmentSpread",
+                        "loc": undefined,
+                        "name": Object {
+                          "kind": "Name",
+                          "loc": undefined,
+                          "value": "authorFields",
+                        },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+            "variableDefinitions": Array [],
+          },
+          Object {
+            "directives": Array [],
+            "kind": "FragmentDefinition",
+            "loc": Object {
+              "end": 40,
+              "source": Object {
+                "body": "fragment authorFields on Author { name }",
+                "locationOffset": Object {
+                  "column": 1,
+                  "line": 1,
+                },
+                "name": "gql",
+              },
+              "start": 0,
+            },
+            "name": Object {
+              "kind": "Name",
+              "loc": undefined,
+              "value": "authorFields",
+            },
+            "selectionSet": Object {
+              "kind": "SelectionSet",
+              "loc": undefined,
+              "selections": Array [
+                Object {
+                  "alias": undefined,
+                  "arguments": Array [],
+                  "directives": Array [],
+                  "kind": "Field",
+                  "loc": undefined,
+                  "name": Object {
+                    "kind": "Name",
+                    "loc": undefined,
+                    "value": "name",
+                  },
+                  "selectionSet": undefined,
+                },
+              ],
+            },
+            "typeCondition": Object {
+              "kind": "NamedType",
+              "loc": undefined,
+              "name": Object {
+                "kind": "Name",
+                "loc": undefined,
+                "value": "Author",
+              },
+            },
+          },
+        ],
+        "kind": "Document",
+        "loc": Object {
+          "end": 81,
+          "source": Object {
+            "body": "{ author { id ...authorFields @defer } } fragment authorFields on Author { name }",
+            "locationOffset": Object {
+              "column": 1,
+              "line": 1,
+            },
+            "name": "gql",
+          },
+          "start": 0,
+        },
+      },
+      "variables": Object {},
+    },
+  },
+]
+`;
