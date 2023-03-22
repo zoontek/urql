@@ -2,6 +2,8 @@ import { AnyVariables, TypedDocumentNode } from '@urql/core';
 import { GraphQLError, DocumentNode, FragmentDefinitionNode } from 'graphql';
 import { IntrospectionData } from './ast';
 
+export type { IntrospectionData } from './ast';
+
 /** Nullable GraphQL list types of `T`.
  *
  * @remarks
